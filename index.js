@@ -15,3 +15,7 @@ const connect = async () => {
 }
 
 connect();
+
+sequelize.query(
+    'CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, name varchar(40) NOT NULL, updated_at TIMESTAMP NOT NULL)'
+);
