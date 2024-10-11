@@ -15,26 +15,38 @@ const connect = async () => {
 }
 
 const create = async () => {
-    await sequelize.query(
-        'CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, name varchar(40) NOT NULL, updated_at TIMESTAMP NOT NULL)'
-    );
+    await sequelize.query(`
+        CREATE TABLE IF NOT EXISTS users (id SERIAL NOT NULL PRIMARY KEY, name varchar(40) NOT NULL, updated_at TIMESTAMP NOT NULL DEFAULT NOW());
+    `);
 
     await sequelize.query(`
-        CREATE OR REPLACE FUNCTION update_updated_at_column()
+        CREATE OR REPLACE FUNCTION trigger_set_timestamp()
         RETURNS TRIGGER AS $$
-        BEGIN
-          NEW.updatedAt = now();
+        BEGIN   
+          NEW.updated_at = now();
           RETURN NEW;
         END;
         $$ language 'plpgsql';
       
-        CREATE TRIGGER update_timestamp
-        BEFORE UPDATE ON "users"
+        CREATE TRIGGER set_timestamp
+        BEFORE UPDATE ON users
         FOR EACH ROW
-        EXECUTE FUNCTION update_updated_at_column();
-      `);
+        EXECUTE FUNCTION trigger_set_timestamp();
+    `);
 }
 
-connect();
-create();
+const insert = async () => {
+    await sequelize.query(`
+        INSERT INTO users (name) VALUES ('Max');
+    `);
+}
+
+const run = async () => {
+    await connect();
+    await create();
+    await insert();
+}
+
+run();
+
 
