@@ -28,7 +28,7 @@ const create = async () => {
         END;
         $$ language 'plpgsql';
       
-        CREATE TRIGGER set_timestamp
+        CREATE OR REPLACE TRIGGER set_timestamp
         BEFORE UPDATE ON users
         FOR EACH ROW
         EXECUTE FUNCTION trigger_set_timestamp();
@@ -37,7 +37,7 @@ const create = async () => {
 
 const insert = async () => {
     await sequelize.query(`
-        INSERT INTO users (name) VALUES ('Max');
+        INSERT INTO users (name) VALUES ('Maxim');
     `);
 }
 
